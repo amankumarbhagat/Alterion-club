@@ -7,6 +7,7 @@ import { errorHandler } from './middlewares/error.middleware.js';
 import { sendSuccess, sendError } from './utils/response.js';
 import authRouter from './routes/auth.routes.js';
 import publicRouter from './routes/public.routes.js';
+import adminRouter from './routes/admin.routes.js';
 
 export const createApp = (): Express => {
   const app = express();
@@ -39,6 +40,7 @@ export const createApp = (): Express => {
   // API Routes
   app.use('/api/auth', authRouter);
   app.use('/api/public', publicRouter);
+  app.use('/api/admin', adminRouter);
 
   // 404 Route Handler
   app.use('*', (req: Request, res: Response) => {
