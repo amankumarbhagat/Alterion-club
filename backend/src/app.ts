@@ -5,6 +5,8 @@ import { env } from './config/env.js';
 import { generalLimiter } from './middlewares/rateLimiter.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import { sendSuccess, sendError } from './utils/response.js';
+import authRouter from './routes/auth.routes.js';
+import publicRouter from './routes/public.routes.js';
 
 export const createApp = (): Express => {
   const app = express();
@@ -33,6 +35,10 @@ export const createApp = (): Express => {
   app.get('/api/health', (_req: Request, res: Response) => {
     sendSuccess(res, undefined, 'Alterino Club API is running', 200);
   });
+
+  // API Routes
+  app.use('/api/auth', authRouter);
+  app.use('/api/public', publicRouter);
 
   // 404 Route Handler
   app.use('*', (req: Request, res: Response) => {

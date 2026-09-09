@@ -1,9 +1,11 @@
+export type AdminRole = 'SUPERADMIN' | 'ADMIN' | 'MODERATOR';
+
 export interface AuthUserPayload {
   id: string;
   username: string;
   email: string;
   name: string;
-  role: 'SUPERADMIN' | 'ADMIN' | 'MODERATOR';
+  role: AdminRole;
 }
 
 declare global {
