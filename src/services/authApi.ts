@@ -5,7 +5,7 @@ export interface AuthUser {
   email: string;
   username?: string;
   name: string;
-  role: 'SUPER_ADMIN' | 'ADMIN' | 'EDITOR' | 'MEMBER';
+  role: 'SUPERADMIN' | 'ADMIN' | 'MODERATOR' | 'SUPER_ADMIN' | 'EDITOR' | 'MEMBER';
 }
 
 export async function loginApi(credentials: { username?: string; email?: string; login?: string; password: string }): Promise<AuthUser> {

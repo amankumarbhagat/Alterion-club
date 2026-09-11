@@ -267,3 +267,105 @@ export async function adminMarkContactRead(id: string, isRead: boolean = true): 
 export async function adminDeleteContactMessage(id: string): Promise<void> {
   await apiClient.delete(`/admin/contact-messages/${id}`);
 }
+
+// ---------------------------------------------------------------------------
+// Event Registrations Admin API
+// ---------------------------------------------------------------------------
+export interface EventRegistration {
+  id: string;
+  eventId: string;
+  name: string;
+  email: string;
+  usn: string;
+  semester: number;
+  branch: string;
+  phone?: string | null;
+  status: 'PENDING' | 'CONFIRMED' | 'ATTENDED' | 'CANCELLED';
+  registeredAt: string;
+}
+
+export async function adminGetEventRegistrations(eventId: string): Promise<EventRegistration[]> {
+  const data = await apiClient.get<any>(`/admin/events/${eventId}/registrations`);
+  const items = Array.isArray(data) ? data : data?.registrations || [];
+  return items.map((r: any) => ({
+    id: r.id,
+    eventId: r.eventId || r.event_id || eventId,
+    name: r.name,
+    email: r.email,
+    usn: r.usn,
+    semester: r.semester,
+    branch: r.branch,
+    phone: r.phone || null,
+    status: r.status,
+    registeredAt: r.registeredAt || r.registered_at || r.createdAt || new Date().toISOString(),
+  }));
+}
+
+export async function adminUpdateRegistrationStatus(id: string, status: string): Promise<EventRegistration> {
+  const data = await apiClient.patch<any>(`/admin/registrations/${id}/status`, { status });
+  return data;
+}
+
+export async function adminDeleteRegistration(id: string): Promise<void> {
+  await apiClient.delete(`/admin/registrations/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Admin User Management API (SUPERADMIN only)
+// ---------------------------------------------------------------------------
+export interface AdminUserRecord {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  role: 'SUPERADMIN' | 'ADMIN' | 'MODERATOR';
+  isActive: boolean;
+  lastLogin?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function adminGetUsers(): Promise<AdminUserRecord[]> {
+  const data = await apiClient.get<any>('/admin/users');
+  const items = Array.isArray(data) ? data : data?.users || [];
+  return items.map((u: any) => ({
+    id: u.id,
+    username: u.username,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    isActive: u.isActive !== undefined ? u.isActive : u.is_active,
+    lastLogin: u.lastLogin || u.last_login || null,
+    createdAt: u.createdAt || u.created_at || new Date().toISOString(),
+    updatedAt: u.updatedAt || u.updated_at || new Date().toISOString(),
+  }));
+}
+
+export async function adminCreateUser(user: {
+  username: string;
+  email: string;
+  password: string;
+  name: string;
+  role: 'SUPERADMIN' | 'ADMIN' | 'MODERATOR';
+  isActive?: boolean;
+}): Promise<AdminUserRecord> {
+  const data = await apiClient.post<any>('/admin/users', user);
+  return data;
+}
+
+export async function adminUpdateUser(
+  id: string,
+  updates: {
+    name?: string;
+    role?: 'SUPERADMIN' | 'ADMIN' | 'MODERATOR';
+    isActive?: boolean;
+    password?: string;
+  }
+): Promise<AdminUserRecord> {
+  const data = await apiClient.patch<any>(`/admin/users/${id}`, updates);
+  return data;
+}
+
+export async function adminDeleteUser(id: string): Promise<void> {
+  await apiClient.delete(`/admin/users/${id}`);
+}
