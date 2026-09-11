@@ -10,7 +10,12 @@
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "seed": "tsx src/seed.ts",
+    "data:import": "tsx src/scripts/importProductionData.ts"
+  },
+  "prisma": {
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

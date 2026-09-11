@@ -13,7 +13,7 @@ export const JoinUs: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [branch, setBranch] = useState('');
   const [year, setYear] = useState('1st Year');
-  const [division, setDivision] = useState(divisions[0]?.name || 'App Development');
+  const [division, setDivision] = useState(divisions[0]?.id || '');
   const [skills, setSkills] = useState('');
   const [motivation, setMotivation] = useState('');
   const [projects, setProjects] = useState('');
@@ -21,6 +21,13 @@ export const JoinUs: React.FC = () => {
   const [linkedin, setLinkedin] = useState('');
   const [portfolio, setPortfolio] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+
+  // Sync initial division selection when divisions load
+  useEffect(() => {
+    if (divisions.length > 0 && (!division || !divisions.some(d => d.id === division))) {
+      setDivision(divisions[0].id);
+    }
+  }, [divisions, division]);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -320,12 +327,11 @@ export const JoinUs: React.FC = () => {
               >
                 {divisions.length === 0 ? (
                   <>
-                    <option value="App Development">App Development</option>
-                    <option value="Research & Development">Research & Development</option>
+                    <option value="">Select a division</option>
                   </>
                 ) : (
                   divisions.map(div => (
-                    <option key={div.id} value={div.name}>
+                    <option key={div.id} value={div.id}>
                       {div.name}
                     </option>
                   ))

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DatabaseProvider } from './context/DatabaseContext';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { InnovationNetwork } from './components/InnovationNetwork';
@@ -89,21 +90,23 @@ export const App: React.FC = () => {
 
   return (
     <DatabaseProvider>
-      <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden">
-        {/* Interactive nodes system */}
-        <InnovationNetwork />
+      <AuthProvider>
+        <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden">
+          {/* Interactive nodes system */}
+          <InnovationNetwork />
 
-        {/* Header navigation bar */}
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+          {/* Header navigation bar */}
+          <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
-        {/* Dynamic page main content */}
-        <main className="flex-grow">
-          {renderPage()}
-        </main>
+          {/* Dynamic page main content */}
+          <main className="flex-grow">
+            {renderPage()}
+          </main>
 
-        {/* Consolidated footer */}
-        <Footer setCurrentPage={setCurrentPage} />
-      </div>
+          {/* Consolidated footer */}
+          <Footer setCurrentPage={setCurrentPage} />
+        </div>
+      </AuthProvider>
     </DatabaseProvider>
   );
 };

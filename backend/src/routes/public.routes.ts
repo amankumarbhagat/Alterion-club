@@ -43,6 +43,7 @@ router.get('/projects/:identifier', getProjectBySlugOrId);
 router.get('/events', getEvents);
 router.get('/events/:identifier', getEventBySlugOrId);
 router.post('/events/:id/register', validateRequest(eventRegistrationSchema), registerForEvent);
+router.post('/events/:id/registrations', validateRequest(eventRegistrationSchema), registerForEvent);
 
 // Achievements, Announcements, Partners, Gallery
 router.get('/achievements', getAchievements);
