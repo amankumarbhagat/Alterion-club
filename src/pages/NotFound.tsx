@@ -41,7 +41,8 @@ export const NotFound: React.FC<NotFoundProps> = ({ setCurrentPage }) => {
         <div className="pt-4">
           <button
             onClick={handleGoHome}
-            className="flex items-center justify-center gap-2 w-full px-6 py-3 font-sans font-bold text-sm tracking-wider uppercase text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] mx-auto"
+            aria-label="Return to Home base"
+            className="flex items-center justify-center gap-2 w-full px-6 py-3 font-sans font-bold text-sm tracking-wider uppercase text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] mx-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
           >
             <CornerDownLeft size={16} /> Return to Home base
           </button>

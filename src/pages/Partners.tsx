@@ -47,6 +47,8 @@ export const Partners: React.FC = () => {
                       src={partner.logo}
                       alt={partner.name}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div>
@@ -70,7 +72,8 @@ export const Partners: React.FC = () => {
                   href={partner.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 font-mono text-[10px] text-slate-400 group-hover:text-[#00f0ff] hover:underline uppercase font-bold"
+                  aria-label={`Visit official website of ${partner.name}`}
+                  className="flex items-center gap-1.5 font-mono text-[10px] text-slate-400 group-hover:text-[#00f0ff] hover:underline uppercase font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 >
                   Visit Website <ExternalLink size={12} />
                 </a>

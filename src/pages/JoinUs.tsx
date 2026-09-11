@@ -159,7 +159,7 @@ export const JoinUs: React.FC = () => {
     return (
       <div className="relative min-h-screen pt-36 pb-16 flex items-center justify-center">
         {/* Particle Canvas */}
-        <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-40" />
+        <canvas ref={canvasRef} aria-hidden="true" className="fixed inset-0 pointer-events-none z-40" />
 
         <div className="max-w-md w-full glass-panel p-8 rounded-2xl border border-white/10 text-center relative z-10 shadow-2xl animate-scale-up">
           <div className="w-16 h-16 rounded-full bg-[#00f0ff]/10 text-[#00f0ff] flex items-center justify-center mx-auto mb-6 border border-[#00f0ff]/30">
@@ -191,7 +191,7 @@ export const JoinUs: React.FC = () => {
               setPortfolio('');
               setResumeFile(null);
             }}
-            className="w-full py-3 font-sans font-bold text-xs uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all"
+            className="w-full py-3 font-sans font-bold text-xs uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
           >
             Apply Again / Submit Another
           </button>
@@ -231,15 +231,19 @@ export const JoinUs: React.FC = () => {
           {/* Row 1: Name & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-name" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <User size={12} className="text-[#00f0ff]" /> Full Name *
               </label>
               <input
+                id="join-name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="e.g. Siddharth Rao"
-                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 ${
+                required
+                aria-required="true"
+                aria-invalid={!!formErrors.name}
+                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                   formErrors.name ? 'border-red-500/50 focus:border-red-500' : ''
                 }`}
               />
@@ -247,15 +251,19 @@ export const JoinUs: React.FC = () => {
             </div>
 
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-email" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <Mail size={12} className="text-[#00f0ff]" /> Email Address *
               </label>
               <input
+                id="join-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="e.g. sid@bmsit.in"
-                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 ${
+                required
+                aria-required="true"
+                aria-invalid={!!formErrors.email}
+                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                   formErrors.email ? 'border-red-500/50 focus:border-red-500' : ''
                 }`}
               />
@@ -266,15 +274,19 @@ export const JoinUs: React.FC = () => {
           {/* Row 2: Phone & Branch */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-phone" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <Phone size={12} className="text-[#3b82f6]" /> Phone Number (10 digit) *
               </label>
               <input
-                type="text"
+                id="join-phone"
+                type="tel"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 placeholder="e.g. 9876543210"
-                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 ${
+                required
+                aria-required="true"
+                aria-invalid={!!formErrors.phone}
+                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                   formErrors.phone ? 'border-red-500/50 focus:border-red-500' : ''
                 }`}
               />
@@ -282,15 +294,19 @@ export const JoinUs: React.FC = () => {
             </div>
 
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-branch" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <BookOpen size={12} className="text-[#3b82f6]" /> Department / Branch *
               </label>
               <input
+                id="join-branch"
                 type="text"
                 value={branch}
                 onChange={e => setBranch(e.target.value)}
                 placeholder="e.g. Computer Science Engineering"
-                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 ${
+                required
+                aria-required="true"
+                aria-invalid={!!formErrors.branch}
+                className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                   formErrors.branch ? 'border-red-500/50 focus:border-red-500' : ''
                 }`}
               />
@@ -301,13 +317,14 @@ export const JoinUs: React.FC = () => {
           {/* Row 3: Year & Preferred Division */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-year" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <Layers size={12} className="text-[#00f0ff]" /> Year of Study *
               </label>
               <select
+                id="join-year"
                 value={year}
                 onChange={e => setYear(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm text-white bg-[#0a0a0f] border border-white/8 focus:border-[#00f0ff]/50 rounded-lg font-sans focus:outline-none"
+                className="w-full px-4 py-2.5 text-sm text-white bg-[#0a0a0f] border border-white/8 focus:border-[#00f0ff]/50 rounded-lg font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 <option value="1st Year">1st Year</option>
                 <option value="2nd Year">2nd Year</option>
@@ -317,13 +334,14 @@ export const JoinUs: React.FC = () => {
             </div>
 
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+              <label htmlFor="join-division" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
                 <Layers size={12} className="text-[#00f0ff]" /> Preferred Division *
               </label>
               <select
+                id="join-division"
                 value={division}
                 onChange={e => setDivision(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm text-white bg-[#0a0a0f] border border-white/8 focus:border-[#00f0ff]/50 rounded-lg font-sans focus:outline-none"
+                className="w-full px-4 py-2.5 text-sm text-white bg-[#0a0a0f] border border-white/8 focus:border-[#00f0ff]/50 rounded-lg font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 {divisions.length === 0 ? (
                   <>
@@ -342,15 +360,19 @@ export const JoinUs: React.FC = () => {
 
           {/* Row 4: Skills */}
           <div>
-            <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+            <label htmlFor="join-skills" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
               <Award size={12} className="text-[#3b82f6]" /> Key Skills (Tech stacks, prototyping libraries) *
             </label>
             <textarea
+              id="join-skills"
               value={skills}
               onChange={e => setSkills(e.target.value)}
               placeholder="e.g. Python, ESP32 programming, React, soldering, UI mockups, Git workflows..."
               rows={3}
-              className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus:outline-none ${
+              required
+              aria-required="true"
+              aria-invalid={!!formErrors.skills}
+              className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                 formErrors.skills ? 'border-red-500/50 focus:border-red-500' : ''
               }`}
             />
@@ -359,15 +381,19 @@ export const JoinUs: React.FC = () => {
 
           {/* Row 5: Motivation */}
           <div>
-            <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
+            <label htmlFor="join-motivation" className="font-sans text-xs text-slate-400 font-semibold mb-2 block flex items-center gap-1.5">
               <Award size={12} className="text-[#00f0ff]" /> Why do you want to join ALTERINO? *
             </label>
             <textarea
+              id="join-motivation"
               value={motivation}
               onChange={e => setMotivation(e.target.value)}
               placeholder="Describe your motivation, what drives you to build innovation projects, and how you want to contribute."
               rows={4}
-              className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus:outline-none ${
+              required
+              aria-required="true"
+              aria-invalid={!!formErrors.motivation}
+              className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                 formErrors.motivation ? 'border-red-500/50 focus:border-red-500' : ''
               }`}
             />
@@ -376,48 +402,52 @@ export const JoinUs: React.FC = () => {
 
           {/* Row 6: Projects */}
           <div>
-            <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
+            <label htmlFor="join-projects" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
               Previous Projects (Link or describe key works)
             </label>
             <textarea
+              id="join-projects"
               value={projects}
               onChange={e => setProjects(e.target.value)}
               placeholder="Describe any apps, electronics hacks, IoT rigs, or websites you built in school or college."
               rows={3}
-              className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus:outline-none"
+              className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             />
           </div>
 
           {/* Row 7: Portfolios - Github / Linkedin / Portfolio links */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">GitHub Link</label>
+              <label htmlFor="join-github" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">GitHub Link</label>
               <input
-                type="text"
+                id="join-github"
+                type="url"
                 value={github}
                 onChange={e => setGithub(e.target.value)}
                 placeholder="https://github.com/username"
-                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600"
+                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               />
             </div>
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">LinkedIn Profile</label>
+              <label htmlFor="join-linkedin" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">LinkedIn Profile</label>
               <input
-                type="text"
+                id="join-linkedin"
+                type="url"
                 value={linkedin}
                 onChange={e => setLinkedin(e.target.value)}
                 placeholder="https://linkedin.com/in/username"
-                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600"
+                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               />
             </div>
             <div>
-              <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Portfolio URL</label>
+              <label htmlFor="join-portfolio" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Portfolio URL</label>
               <input
-                type="text"
+                id="join-portfolio"
+                type="url"
                 value={portfolio}
                 onChange={e => setPortfolio(e.target.value)}
                 placeholder="https://portfolio.com"
-                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600"
+                className="w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               />
             </div>
           </div>
@@ -437,7 +467,7 @@ export const JoinUs: React.FC = () => {
               />
               <label
                 htmlFor="file-upload"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-white/20 hover:border-[#00f0ff]/50 bg-white/5 hover:bg-white/10 text-xs font-mono text-slate-300 hover:text-white cursor-pointer transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-white/20 hover:border-[#00f0ff]/50 bg-white/5 hover:bg-white/10 text-xs font-mono text-slate-300 hover:text-white cursor-pointer transition-all focus-within:ring-2 focus-within:ring-[#00f0ff]"
               >
                 <Upload size={14} className="text-[#00f0ff]" />
                 {resumeFile ? resumeFile.name : 'Select File PDF'}
@@ -449,7 +479,7 @@ export const JoinUs: React.FC = () => {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 px-8 py-3 font-sans font-bold text-sm uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)]"
+              className="flex items-center justify-center gap-2 px-8 py-3 font-sans font-bold text-sm uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               Submit Application <Send size={14} />
             </button>

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDatabase } from '../context/DatabaseContext';
-
 import { X, ChevronLeft, ChevronRight, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Gallery: React.FC = () => {
-  const { gallery } = useDatabase();
+  const { gallery, loading } = useDatabase();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
@@ -30,17 +29,31 @@ export const Gallery: React.FC = () => {
     if (idx !== -1) setLightboxIdx(idx);
   };
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (lightboxIdx === null) return;
+  const handlePrev = useCallback(() => {
+    if (lightboxIdx === null || filteredGallery.length === 0) return;
     setLightboxIdx(prev => (prev === 0 ? filteredGallery.length - 1 : (prev as number) - 1));
-  };
+  }, [lightboxIdx, filteredGallery.length]);
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (lightboxIdx === null) return;
+  const handleNext = useCallback(() => {
+    if (lightboxIdx === null || filteredGallery.length === 0) return;
     setLightboxIdx(prev => (prev === filteredGallery.length - 1 ? 0 : (prev as number) + 1));
-  };
+  }, [lightboxIdx, filteredGallery.length]);
+
+  // Keyboard accessibility: ESC to close, ArrowLeft / ArrowRight to navigate
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightboxIdx(null);
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'ArrowRight') {
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIdx, handlePrev, handleNext]);
 
   const currentItem = lightboxIdx !== null ? filteredGallery[lightboxIdx] : null;
 
@@ -61,10 +74,12 @@ export const Gallery: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/5 pb-6">
+      <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/5 pb-6" role="tablist" aria-label="Gallery category filters">
         {filters.map(filter => (
           <button
             key={filter.value}
+            role="tab"
+            aria-selected={activeFilter === filter.value}
             onClick={() => setActiveFilter(filter.value)}
             className={`px-4 py-2 font-sans font-bold text-xs uppercase tracking-wider rounded-lg border transition-all ${
               activeFilter === filter.value
@@ -78,7 +93,13 @@ export const Gallery: React.FC = () => {
       </div>
 
       {/* Grid Display */}
-      {filteredGallery.length === 0 ? (
+      {loading && gallery.length === 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="glass-panel rounded-xl aspect-video animate-pulse bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      ) : filteredGallery.length === 0 ? (
         <div className="glass-panel p-16 rounded-xl border border-white/5 max-w-md mx-auto text-center">
           <Compass size={48} className="text-slate-600 mx-auto mb-4" />
           <p className="font-mono text-xs text-slate-500 italic">
@@ -90,14 +111,24 @@ export const Gallery: React.FC = () => {
           {filteredGallery.map(item => (
             <div
               key={item.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`View photo: ${item.caption}`}
               onClick={() => openLightbox(item.id)}
-              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer aspect-video relative"
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openLightbox(item.id);
+                }
+              }}
+              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer aspect-video relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               <img
                 src={item.image}
                 alt={item.caption}
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 loading="lazy"
+                decoding="async"
               />
               
               {/* Overlay Caption on Hover */}
@@ -118,28 +149,40 @@ export const Gallery: React.FC = () => {
       <AnimatePresence>
         {currentItem && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Photo lightbox: ${currentItem.caption}`}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
             onClick={() => setLightboxIdx(null)}
           >
             {/* Close Button */}
             <button
               onClick={() => setLightboxIdx(null)}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors border border-white/10 z-10"
+              aria-label="Close photo lightbox"
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors border border-white/10 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               <X size={20} />
             </button>
 
             {/* Navigation buttons */}
             <button
-              onClick={handlePrev}
-              className="absolute left-4 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 hover:border-white/20"
+              onClick={e => {
+                e.stopPropagation();
+                handlePrev();
+              }}
+              aria-label="Previous photo"
+              className="absolute left-4 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 hover:border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               <ChevronLeft size={24} />
             </button>
             
             <button
-              onClick={handleNext}
-              className="absolute right-4 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 hover:border-white/20"
+              onClick={e => {
+                e.stopPropagation();
+                handleNext();
+              }}
+              aria-label="Next photo"
+              className="absolute right-4 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 hover:border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               <ChevronRight size={24} />
             </button>
@@ -157,6 +200,7 @@ export const Gallery: React.FC = () => {
                   src={currentItem.image}
                   alt={currentItem.caption}
                   className="w-full h-full object-contain"
+                  decoding="async"
                 />
               </div>
               

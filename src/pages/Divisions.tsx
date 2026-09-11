@@ -61,14 +61,16 @@ export const Divisions: React.FC = () => {
         <div>
           {/* Division Selector Tabs */}
           <div className="flex justify-center border-b border-white/5 mb-16">
-            <div className="flex gap-2">
+            <div className="flex gap-2" role="tablist" aria-label="Divisions selection">
               {divisions.map(div => {
                 const isActive = div.id === activeDivId;
                 return (
                   <button
                     key={div.id}
+                    role="tab"
+                    aria-selected={isActive}
                     onClick={() => setActiveDivId(div.id)}
-                    className={`flex items-center gap-3 px-6 py-4 font-sans font-bold text-sm uppercase tracking-wider border-b-2 transition-all ${
+                    className={`flex items-center gap-3 px-6 py-4 font-sans font-bold text-sm uppercase tracking-wider border-b-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                       isActive
                         ? 'border-[#00f0ff] text-[#00f0ff] glow-text'
                         : 'border-transparent text-slate-400 hover:text-white'
@@ -84,7 +86,7 @@ export const Divisions: React.FC = () => {
 
           {/* Active Division Panel Detail */}
           {activeDivision && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left" role="tabpanel" aria-label={`${activeDivision.name} division details`}>
               
               {/* Left Column: Vision, Lead and Members */}
               <div className="lg:col-span-4 space-y-8">
@@ -110,6 +112,8 @@ export const Divisions: React.FC = () => {
                           src={leadMember.image}
                           alt={leadMember.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <div>
@@ -139,7 +143,7 @@ export const Divisions: React.FC = () => {
                       {divisionMembers.map(mem => (
                         <div key={mem.id} className="relative group cursor-pointer" title={`${mem.name} - ${mem.role}`}>
                           <div className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-[#00f0ff] transition-all">
-                            <img src={mem.image} alt={mem.name} className="w-full h-full object-cover" />
+                            <img src={mem.image} alt={mem.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                           </div>
                         </div>
                       ))}

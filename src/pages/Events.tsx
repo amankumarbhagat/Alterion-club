@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDatabase } from '../context/DatabaseContext';
 import type { Event } from '../data/seedData';
 import { Calendar, MapPin, Clock, User, Award, Images, X, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Events: React.FC = () => {
-  const { events } = useDatabase();
+  const { events, loading } = useDatabase();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'ongoing' | 'past'>('upcoming');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  // Keyboard accessibility: ESC key to close modal
+  useEffect(() => {
+    if (!selectedEvent) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedEvent(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedEvent]);
 
   const tabs = [
     { label: 'Upcoming', value: 'upcoming' },
@@ -35,10 +47,12 @@ export const Events: React.FC = () => {
 
       {/* Tabs Row */}
       <div className="flex justify-center border-b border-white/5 mb-12">
-        <div className="flex gap-2">
+        <div className="flex gap-2" role="tablist" aria-label="Events status filter">
           {tabs.map(tab => (
             <button
               key={tab.value}
+              role="tab"
+              aria-selected={activeTab === tab.value}
               onClick={() => setActiveTab(tab.value as any)}
               className={`px-6 py-4 font-sans font-bold text-sm uppercase tracking-wider border-b-2 transition-all ${
                 activeTab === tab.value
@@ -53,7 +67,13 @@ export const Events: React.FC = () => {
       </div>
 
       {/* Events Grid */}
-      {filteredEvents.length === 0 ? (
+      {loading && events.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="glass-panel rounded-xl h-80 animate-pulse bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      ) : filteredEvents.length === 0 ? (
         <div className="glass-panel p-16 rounded-xl border border-white/5 max-w-md mx-auto text-center">
           <Calendar size={48} className="text-slate-600 mx-auto mb-4" />
           <p className="font-mono text-xs text-slate-500 italic">
@@ -65,8 +85,17 @@ export const Events: React.FC = () => {
           {filteredEvents.map(event => (
             <div
               key={event.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`View event details: ${event.title}`}
               onClick={() => setSelectedEvent(event)}
-              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between"
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedEvent(event);
+                }
+              }}
+              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               {/* Banner Image */}
               <div className="aspect-[16/10] w-full overflow-hidden relative">
@@ -75,6 +104,7 @@ export const Events: React.FC = () => {
                   alt={event.title}
                   className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                   loading="lazy"
+                  decoding="async"
                 />
                 
                 {/* Status indicator pill */}
@@ -123,7 +153,7 @@ export const Events: React.FC = () => {
                       target="_blank"
                       rel="noreferrer"
                       onClick={e => e.stopPropagation()}
-                      className="flex items-center gap-1 px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded transition-all"
+                      className="flex items-center gap-1 px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                     >
                       Apply <ExternalLink size={10} />
                     </a>
@@ -144,6 +174,9 @@ export const Events: React.FC = () => {
       <AnimatePresence>
         {selectedEvent && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="event-modal-title"
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             onClick={() => setSelectedEvent(null)}
           >
@@ -166,7 +199,8 @@ export const Events: React.FC = () => {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg bg-black/50 hover:bg-black/85 text-slate-400 hover:text-white transition-colors z-20 border border-white/10"
+                aria-label="Close event modal"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-black/50 hover:bg-black/85 text-slate-400 hover:text-white transition-colors z-20 border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 <X size={16} />
               </button>
@@ -179,13 +213,14 @@ export const Events: React.FC = () => {
                     src={selectedEvent.image}
                     alt={selectedEvent.title}
                     className="w-full h-full object-cover"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] to-transparent" />
                   <div className="absolute bottom-4 left-6">
                     <span className="font-mono text-[8px] uppercase tracking-widest font-bold bg-[#00f0ff] text-black px-2 py-0.5 rounded mb-2 inline-block">
                       {selectedEvent.status} Event
                     </span>
-                    <h3 className="font-sans font-extrabold text-2xl md:text-3xl text-white">
+                    <h3 id="event-modal-title" className="font-sans font-extrabold text-2xl md:text-3xl text-white">
                       {selectedEvent.title}
                     </h3>
                   </div>

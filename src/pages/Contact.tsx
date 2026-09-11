@@ -182,13 +182,19 @@ export const Contact: React.FC = () => {
 
                   {/* Name field */}
                   <div>
-                    <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Your Name *</label>
+                    <label htmlFor="contact-name" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
+                      Your Name *
+                    </label>
                     <input
+                      id="contact-name"
                       type="text"
                       value={name}
                       onChange={e => setName(e.target.value)}
                       placeholder="e.g. Siddharth Rao"
-                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus:outline-none ${
+                      required
+                      aria-required="true"
+                      aria-invalid={!!formErrors.name}
+                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                         formErrors.name ? 'border-red-500/50' : ''
                       }`}
                     />
@@ -197,13 +203,19 @@ export const Contact: React.FC = () => {
 
                   {/* Email field */}
                   <div>
-                    <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Your Email Address *</label>
+                    <label htmlFor="contact-email" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
+                      Your Email Address *
+                    </label>
                     <input
+                      id="contact-email"
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="e.g. sid@domain.com"
-                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus:outline-none ${
+                      required
+                      aria-required="true"
+                      aria-invalid={!!formErrors.email}
+                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                         formErrors.email ? 'border-red-500/50' : ''
                       }`}
                     />
@@ -212,13 +224,19 @@ export const Contact: React.FC = () => {
 
                   {/* Subject field */}
                   <div>
-                    <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Transmission Subject *</label>
+                    <label htmlFor="contact-subject" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
+                      Transmission Subject *
+                    </label>
                     <input
+                      id="contact-subject"
                       type="text"
                       value={subject}
                       onChange={e => setSubject(e.target.value)}
                       placeholder="e.g. Sponsorship Proposal / Project Inquiry"
-                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus:outline-none ${
+                      required
+                      aria-required="true"
+                      aria-invalid={!!formErrors.subject}
+                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                         formErrors.subject ? 'border-red-500/50' : ''
                       }`}
                     />
@@ -227,13 +245,19 @@ export const Contact: React.FC = () => {
 
                   {/* Message body */}
                   <div>
-                    <label className="font-sans text-xs text-slate-400 font-semibold mb-2 block">Message Details *</label>
+                    <label htmlFor="contact-message" className="font-sans text-xs text-slate-400 font-semibold mb-2 block">
+                      Message Details *
+                    </label>
                     <textarea
+                      id="contact-message"
                       value={message}
                       onChange={e => setMessage(e.target.value)}
                       placeholder="Type your message description here..."
                       rows={5}
-                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus:outline-none ${
+                      required
+                      aria-required="true"
+                      aria-invalid={!!formErrors.message}
+                      className={`w-full px-4 py-2.5 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] ${
                         formErrors.message ? 'border-red-500/50' : ''
                       }`}
                     />
@@ -248,7 +272,8 @@ export const Contact: React.FC = () => {
                   
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-6 py-2.5 font-sans font-bold text-xs uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_12px_rgba(0,240,255,0.2)]"
+                    aria-label="Send Transmission"
+                    className="flex items-center gap-2 px-6 py-2.5 font-sans font-bold text-xs uppercase tracking-wider text-black bg-[#00f0ff] hover:bg-[#00e0ef] rounded-lg transition-all shadow-[0_0_12px_rgba(0,240,255,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                   >
                     Send Transmission <Send size={12} />
                   </button>

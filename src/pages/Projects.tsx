@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDatabase } from '../context/DatabaseContext';
 import type { Project } from '../data/seedData';
 import { Globe, X, Target, Sparkles, BookOpen, Users, Compass } from 'lucide-react';
@@ -6,9 +6,21 @@ import { Github } from '../components/SocialIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Projects: React.FC = () => {
-  const { projects, members } = useDatabase();
+  const { projects, members, loading } = useDatabase();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedProj, setSelectedProj] = useState<Project | null>(null);
+
+  // Keyboard accessibility: ESC key to close modal
+  useEffect(() => {
+    if (!selectedProj) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedProj(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedProj]);
 
   const filters = [
     { label: 'All Projects', value: 'all' },
@@ -41,10 +53,12 @@ export const Projects: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/5 pb-6">
+      <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/5 pb-6" role="tablist" aria-label="Projects category filters">
         {filters.map(filter => (
           <button
             key={filter.value}
+            role="tab"
+            aria-selected={activeFilter === filter.value}
             onClick={() => setActiveFilter(filter.value)}
             className={`px-4 py-2 font-sans font-bold text-xs uppercase tracking-wider rounded-lg border transition-all ${
               activeFilter === filter.value
@@ -58,7 +72,13 @@ export const Projects: React.FC = () => {
       </div>
 
       {/* Projects Grid */}
-      {filteredProjects.length === 0 ? (
+      {loading && projects.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[1, 2].map(i => (
+            <div key={i} className="glass-panel rounded-xl h-96 animate-pulse bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      ) : filteredProjects.length === 0 ? (
         <div className="glass-panel p-16 rounded-xl border border-white/5 max-w-md mx-auto text-center">
           <Compass size={48} className="text-slate-600 mx-auto mb-4" />
           <p className="font-mono text-xs text-slate-500 italic">
@@ -74,8 +94,17 @@ export const Projects: React.FC = () => {
             return (
               <div
                 key={proj.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`View project details: ${proj.title}`}
                 onClick={() => setSelectedProj(proj)}
-                className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedProj(proj);
+                  }
+                }}
+                className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 {/* Banner image with hover effect */}
                 <div className="aspect-video w-full overflow-hidden relative border-b border-white/5">
@@ -84,6 +113,7 @@ export const Projects: React.FC = () => {
                     alt={proj.title}
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508]/60 to-transparent" />
                   
@@ -128,30 +158,27 @@ export const Projects: React.FC = () => {
 
                   {/* Progress & Team members row */}
                   <div className="border-t border-white/5 pt-4 flex items-center justify-between gap-6">
-                    {/* Team avatars */}
-                    <div className="flex -space-x-2 overflow-hidden shrink-0">
-                      {team.map((mem, idx) => (
-                        <div
-                          key={mem?.id || idx}
-                          className="inline-block h-6 w-6 rounded-full ring-2 ring-[#050508] overflow-hidden"
-                          title={mem?.name}
-                        >
-                          <img src={mem?.image} alt={mem?.name} className="h-full w-full object-cover" />
-                        </div>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <div className="flex -space-x-2 overflow-hidden">
+                        {team.slice(0, 3).map((mem, idx) => (
+                          <div key={idx} className="inline-block h-6 w-6 rounded-full ring-2 ring-[#050508] overflow-hidden">
+                            <img src={mem?.image} alt={mem?.name} className="h-full w-full object-cover" decoding="async" />
+                          </div>
+                        ))}
+                      </div>
+                      <span className="font-sans text-[10px] text-slate-400">
+                        {team.length} Builders
+                      </span>
                     </div>
 
-                    {/* Progress Slider */}
-                    <div className="flex-1 flex items-center gap-2 max-w-[120px]">
-                      <div className="flex-1 bg-white/10 h-1 rounded-full overflow-hidden">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] text-[#00f0ff] font-bold">
+                        {proj.progress}%
+                      </span>
+                      <div className="w-16 bg-white/10 h-1 rounded-full overflow-hidden">
                         <div className="bg-[#00f0ff] h-full" style={{ width: `${proj.progress}%` }} />
                       </div>
-                      <span className="font-mono text-[9px] text-[#00f0ff] font-bold">{proj.progress}%</span>
                     </div>
-
-                    <span className="font-mono text-[9px] text-[#3b82f6] uppercase tracking-widest font-bold">
-                      Inspect →
-                    </span>
                   </div>
                 </div>
 
@@ -165,6 +192,9 @@ export const Projects: React.FC = () => {
       <AnimatePresence>
         {selectedProj && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-modal-title"
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             onClick={() => setSelectedProj(null)}
           >
@@ -187,7 +217,8 @@ export const Projects: React.FC = () => {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedProj(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg bg-black/50 hover:bg-black/85 text-slate-400 hover:text-white transition-colors z-20 border border-white/10"
+                aria-label="Close project modal"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-black/50 hover:bg-black/85 text-slate-400 hover:text-white transition-colors z-20 border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 <X size={16} />
               </button>
@@ -200,13 +231,14 @@ export const Projects: React.FC = () => {
                     src={selectedProj.image}
                     alt={selectedProj.title}
                     className="w-full h-full object-cover"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] to-transparent" />
                   <div className="absolute bottom-4 left-6">
                     <span className="font-mono text-[8px] uppercase tracking-widest font-bold bg-[#00f0ff] text-black px-2 py-0.5 rounded mb-2 inline-block">
                       {selectedProj.status} build
                     </span>
-                    <h3 className="font-sans font-extrabold text-2xl md:text-3xl text-white">
+                    <h3 id="project-modal-title" className="font-sans font-extrabold text-2xl md:text-3xl text-white">
                       {selectedProj.title}
                     </h3>
                   </div>

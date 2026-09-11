@@ -184,8 +184,17 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               {/* Node 1: APP DEV */}
               <motion.g
                 whileHover={{ scale: 1.1 }}
-                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label="Navigate to App Dev division"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 onClick={() => handleNav('divisions', '#/divisions')}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav('divisions', '#/divisions');
+                  }
+                }}
               >
                 <circle cx="200" cy="80" r="18" fill="#050508" stroke="#3b82f6" strokeWidth="2" />
                 <circle cx="200" cy="80" r="5" fill="#00f0ff" className="animate-ping" />
@@ -196,8 +205,17 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               {/* Node 2: R&D */}
               <motion.g
                 whileHover={{ scale: 1.1 }}
-                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label="Navigate to Research & Dev division"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 onClick={() => handleNav('divisions', '#/divisions')}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav('divisions', '#/divisions');
+                  }
+                }}
               >
                 <circle cx="310" cy="150" r="18" fill="#050508" stroke="#00f0ff" strokeWidth="2" />
                 <circle cx="310" cy="150" r="3" fill="#3b82f6" />
@@ -207,8 +225,17 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               {/* Node 3: PROJECTS */}
               <motion.g
                 whileHover={{ scale: 1.1 }}
-                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label="Navigate to Projects"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 onClick={() => handleNav('projects', '#/projects')}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav('projects', '#/projects');
+                  }
+                }}
               >
                 <circle cx="280" cy="290" r="18" fill="#050508" stroke="#3b82f6" strokeWidth="2" />
                 <circle cx="280" cy="290" r="3" fill="#3b82f6" />
@@ -218,8 +245,17 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               {/* Node 4: EVENTS */}
               <motion.g
                 whileHover={{ scale: 1.1 }}
-                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label="Navigate to Events"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 onClick={() => handleNav('events', '#/events')}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav('events', '#/events');
+                  }
+                }}
               >
                 <circle cx="120" cy="290" r="18" fill="#050508" stroke="#00f0ff" strokeWidth="2" />
                 <circle cx="120" cy="290" r="3" fill="#00f0ff" />
@@ -229,8 +265,17 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               {/* Node 5: COMMUNITY */}
               <motion.g
                 whileHover={{ scale: 1.1 }}
-                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label="Navigate to About and Community"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 onClick={() => handleNav('about', '#/about')}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav('about', '#/about');
+                  }
+                }}
               >
                 <circle cx="90" cy="150" r="18" fill="#050508" stroke="#3b82f6" strokeWidth="2" />
                 <circle cx="90" cy="150" r="3" fill="#00f0ff" />
@@ -357,6 +402,7 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
                         alt={event.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <div className="flex flex-col justify-between text-left flex-1 min-w-0">
@@ -422,6 +468,7 @@ export const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
                         alt={proj.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <div className="flex flex-col justify-between text-left flex-1 min-w-0">

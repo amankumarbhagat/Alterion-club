@@ -1,0 +1,10 @@
+# ALTERINO Club - Robots Exclusion Standard
+# Default crawler rules for official club website
+
+User-agent: *
+Allow: /
+Disallow: /#/admin
+Disallow: /admin
+
+# Sitemap location (Update domain if deploying to custom institution subdomain)
+Sitemap: https://alterino.org/sitemap.xml

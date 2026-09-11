@@ -34,6 +34,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
     localStorage.setItem('alterino_theme', theme);
   }, [theme]);
 
+  // Accessibility: Close mobile menu on Escape key press
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileMenuOpen]);
+
   const navLinks = [
     { label: 'Home', id: 'home', hash: '#/' },
     { label: 'About', id: 'about', hash: '#/about' },
@@ -59,6 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
 
   return (
     <nav
+      aria-label="Main navigation"
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-[#050508]/85 dark:bg-[#050508]/85 border-b border-white/5 backdrop-blur-md shadow-lg py-3'
@@ -69,17 +82,31 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
         <div className="flex items-center justify-between">
           
           {/* Logo */}
-          <div className="cursor-pointer" onClick={() => handleNavClick('home', '#/')}>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Alterino Club Home"
+            onClick={() => handleNavClick('home', '#/')}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNavClick('home', '#/');
+              }
+            }}
+            className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] rounded-lg"
+          >
             <Logo />
           </div>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-1 xl:gap-2">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2" role="menubar">
             {navLinks.map(link => {
               const isActive = currentPage === link.id;
               return (
                 <button
                   key={link.id}
+                  role="menuitem"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => handleNavClick(link.id, link.hash)}
                   className={`px-3 py-2 rounded-md font-sans text-sm font-medium tracking-wide transition-all ${
                     isActive
@@ -98,6 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               className="p-2 rounded-lg border border-white/5 hover:border-white/20 bg-white/5 text-slate-400 hover:text-white transition-colors"
               title="Toggle Light/Dark Theme"
             >
@@ -107,6 +135,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             {/* CTA Join Button */}
             <button
               onClick={() => handleNavClick('join', '#/join')}
+              aria-label="Join Alterino Club recruitment"
               className={`flex items-center gap-2 px-4 py-2 text-xs font-sans uppercase font-bold tracking-wider rounded-lg border transition-all ${
                 currentPage === 'join'
                   ? 'bg-[#00f0ff] text-black border-[#00f0ff]'
@@ -122,6 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             {/* Theme Toggle Mobile */}
             <button
               onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               className="p-2 rounded-lg border border-white/5 bg-white/5 text-slate-400 hover:text-white transition-colors"
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -130,6 +160,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             {/* Hamburger */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation-menu"
               className="p-2 rounded-lg border border-white/5 bg-white/5 text-slate-400 hover:text-white transition-colors"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -141,13 +174,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-[#050508]/95 border-b border-white/10 backdrop-blur-xl shadow-2xl animate-fade-in">
+        <div
+          id="mobile-navigation-menu"
+          role="region"
+          aria-label="Mobile navigation menu"
+          className="lg:hidden absolute top-full left-0 w-full bg-[#050508]/95 border-b border-white/10 backdrop-blur-xl shadow-2xl animate-fade-in"
+        >
           <div className="px-4 pt-3 pb-6 space-y-2">
             {navLinks.map(link => {
               const isActive = currentPage === link.id;
               return (
                 <button
                   key={link.id}
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => handleNavClick(link.id, link.hash)}
                   className={`block w-full text-left px-4 py-3 rounded-lg font-sans text-base font-semibold tracking-wide transition-all ${
                     isActive
@@ -163,6 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             {/* Join Us CTA Mobile */}
             <button
               onClick={() => handleNavClick('join', '#/join')}
+              aria-label="Join Alterino Club recruitment"
               className={`flex items-center justify-center gap-2 w-full mt-4 px-4 py-3 text-sm font-sans uppercase font-bold tracking-wider rounded-lg transition-all ${
                 currentPage === 'join'
                   ? 'bg-[#00f0ff] text-black'

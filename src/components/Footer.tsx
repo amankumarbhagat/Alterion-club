@@ -27,7 +27,21 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
           
           {/* Logo & Vision Block */}
           <div className="flex flex-col gap-4">
-            <Logo size={40} />
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Alterino Club Home"
+              onClick={() => handleNavClick('home', '#/')}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleNavClick('home', '#/');
+                }
+              }}
+              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] rounded-lg self-start"
+            >
+              <Logo size={40} />
+            </div>
             <p className="font-sans text-sm text-slate-400 mt-2 leading-relaxed">
               Where ideas become experiments, experiments become products, and students become builders. An engineering innovation ecosystem.
             </p>
@@ -36,8 +50,9 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 href="https://github.com"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all"
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 title="GitHub Organization"
+                aria-label="Alterino GitHub Organization"
               >
                 <Github size={16} />
               </a>
@@ -45,15 +60,17 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all"
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 title="LinkedIn Page"
+                aria-label="Alterino LinkedIn Page"
               >
                 <Linkedin size={16} />
               </a>
               <a
                 href="mailto:contact@alterino.org"
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all"
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 title="Email Club"
+                aria-label="Email Alterino Club"
               >
                 <Mail size={16} />
               </a>

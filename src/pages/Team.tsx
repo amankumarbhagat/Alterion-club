@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDatabase } from '../context/DatabaseContext';
 import type { Member } from '../data/seedData';
 import { Search, Mail, X, UserCheck } from 'lucide-react';
@@ -6,10 +6,22 @@ import { Github, Linkedin } from '../components/SocialIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Team: React.FC = () => {
-  const { members } = useDatabase();
+  const { members, loading } = useDatabase();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'Leadership' | 'App Dev' | 'R&D' | 'Other'>('all');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+
+  // Keyboard accessibility: ESC key to close modal
+  useEffect(() => {
+    if (!selectedMember) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedMember(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedMember]);
 
   const filters = [
     { label: 'All Builders', value: 'all' },
@@ -49,10 +61,12 @@ export const Team: React.FC = () => {
       {/* Search & Filter Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         {/* Filters */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Team division filter">
           {filters.map(filter => (
             <button
               key={filter.value}
+              role="tab"
+              aria-selected={activeFilter === filter.value}
               onClick={() => setActiveFilter(filter.value as any)}
               className={`px-4 py-2 font-sans font-bold text-xs uppercase tracking-wider rounded-lg border transition-all ${
                 activeFilter === filter.value
@@ -70,16 +84,23 @@ export const Team: React.FC = () => {
           <input
             type="text"
             placeholder="Search name, role, skills..."
+            aria-label="Search members by name, role, or skills"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-500"
+            className="w-full pl-10 pr-4 py-2 text-sm text-white glass-input rounded-lg font-sans placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
           />
-          <Search size={16} className="absolute left-3.5 top-3 text-slate-500" />
+          <Search size={16} className="absolute left-3.5 top-3 text-slate-500" aria-hidden="true" />
         </div>
       </div>
 
       {/* Directory Cards Grid */}
-      {filteredMembers.length === 0 ? (
+      {loading && members.length === 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="glass-panel rounded-xl h-72 animate-pulse bg-white/5 border border-white/5" />
+          ))}
+        </div>
+      ) : filteredMembers.length === 0 ? (
         <div className="glass-panel p-16 text-center text-slate-500 font-mono text-sm max-w-sm mx-auto rounded-xl border border-white/5">
           "No builders found matching search queries."
         </div>
@@ -88,8 +109,17 @@ export const Team: React.FC = () => {
           {filteredMembers.map(mem => (
             <div
               key={mem.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`View profile: ${mem.name}`}
               onClick={() => setSelectedMember(mem)}
-              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between"
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedMember(mem);
+                }
+              }}
+              className="glass-panel rounded-xl overflow-hidden border border-white/5 hover:border-[#00f0ff]/30 group transition-all duration-300 cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
             >
               {/* Photo Frame */}
               <div className="aspect-[4/3] w-full overflow-hidden relative border-b border-white/5">
@@ -98,6 +128,7 @@ export const Team: React.FC = () => {
                   alt={mem.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  decoding="async"
                 />
                 
                 {/* Micro social slide-in on card hover (preventing click-through modal triggers) */}
@@ -106,8 +137,9 @@ export const Team: React.FC = () => {
                     href={mem.github}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`${mem.name}'s GitHub profile`}
                     onClick={e => e.stopPropagation()}
-                    className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-white"
+                    className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                   >
                     <Github size={12} />
                   </a>
@@ -115,8 +147,9 @@ export const Team: React.FC = () => {
                     href={mem.linkedin}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`${mem.name}'s LinkedIn profile`}
                     onClick={e => e.stopPropagation()}
-                    className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-white"
+                    className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                   >
                     <Linkedin size={12} />
                   </a>
@@ -139,15 +172,17 @@ export const Team: React.FC = () => {
                   <h4 className="font-sans font-bold text-white text-base truncate group-hover:text-[#00f0ff] transition-colors">
                     {mem.name}
                   </h4>
-                  <p className="font-sans text-xs text-slate-400 truncate mt-1">
+                  <p className="font-sans text-xs text-slate-400 mt-0.5">
                     {mem.role}
                   </p>
                 </div>
 
-                {/* Skills snippets */}
-                <div className="flex flex-wrap gap-1 mt-4">
-                  {mem.skills.slice(0, 3).map(skill => (
-                    <span key={skill} className="font-mono text-[8px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">
+                <div className="mt-4 border-t border-white/5 pt-3 flex flex-wrap gap-1">
+                  {mem.skills.slice(0, 3).map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="font-mono text-[8px] text-slate-400 bg-white/5 border border-white/5 px-1.5 py-0.5 rounded"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -168,6 +203,9 @@ export const Team: React.FC = () => {
       <AnimatePresence>
         {selectedMember && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="member-modal-title"
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             onClick={() => setSelectedMember(null)}
           >
@@ -190,7 +228,8 @@ export const Team: React.FC = () => {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedMember(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                aria-label="Close builder profile"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
               >
                 <X size={16} />
               </button>
@@ -202,6 +241,7 @@ export const Team: React.FC = () => {
                     src={selectedMember.image}
                     alt={selectedMember.name}
                     className="w-full h-full object-cover"
+                    decoding="async"
                   />
                 </div>
 
@@ -210,7 +250,7 @@ export const Team: React.FC = () => {
                   <span className="font-mono text-[8px] uppercase tracking-widest text-[#00f0ff] font-bold bg-[#00f0ff]/10 px-2 py-0.5 rounded mb-2 inline-block">
                     Division: {selectedMember.division}
                   </span>
-                  <h3 className="font-sans font-extrabold text-xl md:text-2xl text-white truncate mb-1">
+                  <h3 id="member-modal-title" className="font-sans font-extrabold text-xl md:text-2xl text-white truncate mb-1">
                     {selectedMember.name}
                   </h3>
                   <p className="font-sans text-sm text-[#3b82f6] font-medium mb-3">
