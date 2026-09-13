@@ -6,14 +6,15 @@ async function main() {
   console.log('🌱 Starting Alterino database seed...');
 
   // 1. SuperAdmin User
-  const defaultAdminPassword = 'AdminPassword123!';
+  const shouldResetPassword = process.env['RESET_ADMIN_PASSWORD'] === 'true';
+  const defaultAdminPassword = process.env['INITIAL_ADMIN_PASSWORD'] || 'AdminPassword123!';
   const passwordHash = await hashPassword(defaultAdminPassword);
 
   const admin = await prisma.adminUser.upsert({
     where: { username: 'admin' },
     update: {
       email: 'admin@alterino.club',
-      passwordHash,
+      ...(shouldResetPassword ? { passwordHash } : {}),
       name: 'Super Administrator',
       role: AdminRole.SUPERADMIN,
       isActive: true,

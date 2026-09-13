@@ -130,6 +130,12 @@ export const getMemberById = async (req: Request, res: Response, next: NextFunct
       return;
     }
 
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    if (!isUuid) {
+      sendError(res, 'Member not found', 404);
+      return;
+    }
+
     const member = await prisma.member.findUnique({
       where: { id },
       include: {
@@ -330,6 +336,12 @@ export const registerForEvent = async (req: Request, res: Response, next: NextFu
     const eventId = (req.params.id as string) || '';
     if (!eventId) {
       sendError(res, 'Event ID is required', 400);
+      return;
+    }
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventId);
+    if (!isUuid) {
+      sendError(res, 'Event not found', 404);
       return;
     }
 

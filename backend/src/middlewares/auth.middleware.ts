@@ -75,7 +75,7 @@ export const requireRole = (...allowedRoles: AdminRole[]) => {
 
 export const cookieOptions = (maxAgeMs?: number): object => ({
   httpOnly: true,
-  secure: process.env['NODE_ENV'] === 'production',
+  secure: env.NODE_ENV === 'production',
   sameSite: 'strict' as const,
   path: '/',
   ...(maxAgeMs !== undefined && { maxAge: maxAgeMs }),

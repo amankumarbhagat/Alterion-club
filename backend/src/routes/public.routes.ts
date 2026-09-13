@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validateRequest } from '../middlewares/validate.middleware.js';
+import { submissionLimiter } from '../middlewares/rateLimiter.js';
 import {
   eventRegistrationSchema,
   applicationSubmissionSchema,
@@ -42,8 +43,8 @@ router.get('/projects/:identifier', getProjectBySlugOrId);
 // Events
 router.get('/events', getEvents);
 router.get('/events/:identifier', getEventBySlugOrId);
-router.post('/events/:id/register', validateRequest(eventRegistrationSchema), registerForEvent);
-router.post('/events/:id/registrations', validateRequest(eventRegistrationSchema), registerForEvent);
+router.post('/events/:id/register', submissionLimiter, validateRequest(eventRegistrationSchema), registerForEvent);
+router.post('/events/:id/registrations', submissionLimiter, validateRequest(eventRegistrationSchema), registerForEvent);
 
 // Achievements, Announcements, Partners, Gallery
 router.get('/achievements', getAchievements);
@@ -57,7 +58,7 @@ router.get('/stats', getSiteStats);
 router.get('/site-metrics', getSiteStats);
 
 // Form Submissions
-router.post('/applications', validateRequest(applicationSubmissionSchema), submitApplication);
-router.post('/contact', validateRequest(contactMessageSchema), submitContactMessage);
+router.post('/applications', submissionLimiter, validateRequest(applicationSubmissionSchema), submitApplication);
+router.post('/contact', submissionLimiter, validateRequest(contactMessageSchema), submitContactMessage);
 
 export default router;
