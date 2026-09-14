@@ -30,10 +30,20 @@ export const createApp = (): Express => {
     next();
   });
 
-  // CORS: Restrict development localhost origins to non-production environments
-  const allowedOrigins = [env.FRONTEND_URL];
+  // CORS: Parse comma-separated allowed origins from FRONTEND_URL
+  const configuredOrigins = env.FRONTEND_URL
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  const allowedOrigins = [...configuredOrigins];
   if (env.NODE_ENV !== 'production') {
-    allowedOrigins.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    if (!allowedOrigins.includes('http://localhost:5173')) {
+      allowedOrigins.push('http://localhost:5173');
+    }
+    if (!allowedOrigins.includes('http://127.0.0.1:5173')) {
+      allowedOrigins.push('http://127.0.0.1:5173');
+    }
   }
 
   app.use(

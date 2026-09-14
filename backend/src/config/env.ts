@@ -28,6 +28,47 @@ const envSchema = z
       message: 'In production, JWT_SECRET must not use the default value and must be at least 32 characters long.',
       path: ['JWT_SECRET'],
     }
+  )
+  .refine(
+    (data) => {
+      if (data.NODE_ENV === 'production') {
+        return (
+          Boolean(process.env['DATABASE_URL']) &&
+          data.DATABASE_URL !== 'postgresql://postgres:postgres@localhost:5432/alterino_db?schema=public'
+        );
+      }
+      return true;
+    },
+    {
+      message: 'In production, DATABASE_URL must be explicitly configured and not use the default local connection string.',
+      path: ['DATABASE_URL'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.NODE_ENV === 'production') {
+        if (!process.env['FRONTEND_URL'] || data.FRONTEND_URL === 'http://localhost:5173') {
+          return false;
+        }
+        const origins = data.FRONTEND_URL.split(',').map((o) => o.trim()).filter(Boolean);
+        return (
+          origins.length > 0 &&
+          origins.every((o) => {
+            try {
+              const u = new URL(o);
+              return u.protocol === 'http:' || u.protocol === 'https:';
+            } catch {
+              return false;
+            }
+          })
+        );
+      }
+      return true;
+    },
+    {
+      message: 'In production, FRONTEND_URL must be explicitly configured with one or more valid URLs (comma-separated).',
+      path: ['FRONTEND_URL'],
+    }
   );
 
 const parseEnv = () => {

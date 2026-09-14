@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, CookieOptions } from 'express';
 import { sendError } from '../utils/response.js';
 import { safeVerifyToken } from '../utils/jwt.js';
 import { env } from '../config/env.js';
@@ -73,10 +73,13 @@ export const requireRole = (...allowedRoles: AdminRole[]) => {
 // Cookie options helper (DRY)
 // ---------------------------------------------------------------------------
 
-export const cookieOptions = (maxAgeMs?: number): object => ({
-  httpOnly: true,
-  secure: env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
-  path: '/',
-  ...(maxAgeMs !== undefined && { maxAge: maxAgeMs }),
-});
+export const cookieOptions = (maxAgeMs?: number): CookieOptions => {
+  const isProd = env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? ('none' as const) : ('lax' as const),
+    path: '/',
+    ...(maxAgeMs !== undefined && { maxAge: maxAgeMs }),
+  };
+};
