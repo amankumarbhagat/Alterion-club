@@ -202,6 +202,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addMember = async (m: Omit<Member, 'id'>) => {
     if (IS_API_MODE) {
       try {
+        setError(null);
         const created = await adminApi.adminCreateMember(m as Member);
         setMembers(prev => [...prev, created]);
       } catch (err: any) {
@@ -216,6 +217,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const updateMember = async (id: string, m: Partial<Member>) => {
     if (IS_API_MODE) {
       try {
+        setError(null);
         const updated = await adminApi.adminUpdateMember(id, m);
         setMembers(prev => prev.map(item => item.id === id ? updated : item));
       } catch (err: any) {
@@ -230,6 +232,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const deleteMember = async (id: string) => {
     if (IS_API_MODE) {
       try {
+        setError(null);
         await adminApi.adminDeleteMember(id);
         setMembers(prev => prev.filter(item => item.id !== id));
       } catch (err: any) {

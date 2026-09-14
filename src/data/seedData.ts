@@ -2,7 +2,8 @@ export interface Member {
   id: string;
   name: string;
   role: string;
-  division: 'Leadership' | 'App Dev' | 'R&D' | 'Other';
+  division: 'Leadership' | 'App Dev' | 'R&D' | 'Other' | string;
+  divisionId?: string;
   email: string;
   github: string;
   linkedin: string;

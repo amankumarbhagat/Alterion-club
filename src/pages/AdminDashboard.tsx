@@ -187,6 +187,7 @@ export const AdminDashboard: React.FC = () => {
     name: '',
     role: '',
     division: 'App Dev',
+    divisionId: '',
     email: '',
     github: '',
     linkedin: '',
@@ -418,10 +419,12 @@ export const AdminDashboard: React.FC = () => {
     setIsFormOpen(true);
 
     if (activeTab === 'members') {
+      const defaultDiv = db.divisions[0];
       setMemberForm({
         name: '',
         role: '',
-        division: 'App Dev',
+        division: defaultDiv ? (defaultDiv.name === 'App Development' ? 'App Dev' : defaultDiv.name) : 'App Dev',
+        divisionId: defaultDiv?.id || '',
         email: '',
         github: '',
         linkedin: '',
@@ -515,7 +518,19 @@ export const AdminDashboard: React.FC = () => {
     if (activeTab === 'members') {
       const item = db.members.find(m => m.id === id);
       if (item) {
-        setMemberForm(item);
+        let divId = item.divisionId;
+        if (!divId && item.division) {
+          const matched = db.divisions.find(d =>
+            d.name.toLowerCase() === item.division.toLowerCase() ||
+            (item.division === 'App Dev' && d.name === 'App Development') ||
+            (item.division === 'R&D' && d.name === 'Research & Development')
+          );
+          if (matched) divId = matched.id;
+        }
+        setMemberForm({
+          ...item,
+          divisionId: divId || db.divisions[0]?.id || '',
+        });
         setMemberSkillsStr(item.skills?.join(', ') || '');
       }
     } else if (activeTab === 'divisions') {
@@ -558,11 +573,11 @@ export const AdminDashboard: React.FC = () => {
 
     // Client-side field validations
     if (activeTab === 'members') {
-      if (!memberForm.name.trim()) {
+      if (!memberForm.name?.trim()) {
         setFormError('Member name is required.');
         return;
       }
-      if (!memberForm.email.trim() || !memberForm.email.includes('@')) {
+      if (!memberForm.email?.trim() || !memberForm.email.includes('@')) {
         setFormError('A valid email address is required.');
         return;
       }
@@ -594,9 +609,27 @@ export const AdminDashboard: React.FC = () => {
           .split(',')
           .map(s => s.trim())
           .filter(Boolean);
-        const payload = { ...memberForm, skills: skillsArray };
 
-        if (formMode === 'create') await db.addMember(payload);
+        let targetDivisionId = memberForm.divisionId;
+        if (!targetDivisionId && memberForm.division) {
+          const matched = db.divisions.find(d =>
+            d.name.toLowerCase() === memberForm.division?.toLowerCase() ||
+            (memberForm.division === 'App Dev' && d.name === 'App Development') ||
+            (memberForm.division === 'R&D' && d.name === 'Research & Development')
+          );
+          if (matched) targetDivisionId = matched.id;
+        }
+        if (!targetDivisionId && db.divisions.length > 0) {
+          targetDivisionId = db.divisions[0].id;
+        }
+
+        const payload = {
+          ...memberForm,
+          divisionId: targetDivisionId,
+          skills: skillsArray,
+        };
+
+        if (formMode === 'create') await db.addMember(payload as any);
         else if (editId) await db.updateMember(editId, payload);
         showFeedback(`Member ${formMode === 'create' ? 'created' : 'updated'} successfully.`);
       } else if (activeTab === 'divisions') {
@@ -820,7 +853,9 @@ export const AdminDashboard: React.FC = () => {
         m.role.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesDiv =
         memberDivisionFilter === 'all' ||
-        m.division.toLowerCase() === memberDivisionFilter.toLowerCase();
+        m.division.toLowerCase() === memberDivisionFilter.toLowerCase() ||
+        (memberDivisionFilter === 'App Dev' && (m.division === 'App Development' || m.division === 'App Dev')) ||
+        (memberDivisionFilter === 'R&D' && (m.division === 'Research & Development' || m.division === 'R&D'));
       const matchesLead =
         memberLeadershipFilter === 'all' ||
         (memberLeadershipFilter === 'lead' ? m.isLeadership : !m.isLeadership);
@@ -2699,14 +2734,41 @@ export const AdminDashboard: React.FC = () => {
                   <div>
                     <label className="font-sans text-xs text-slate-400 mb-1 block">Division *</label>
                     <select
-                      value={memberForm.division}
-                      onChange={e => setMemberForm({ ...memberForm, division: e.target.value as any })}
+                      value={
+                        memberForm.divisionId ||
+                        db.divisions.find(d =>
+                          d.name.toLowerCase() === memberForm.division?.toLowerCase() ||
+                          (memberForm.division === 'App Dev' && d.name === 'App Development') ||
+                          (memberForm.division === 'R&D' && d.name === 'Research & Development')
+                        )?.id ||
+                        ''
+                      }
+                      onChange={e => {
+                        const selectedId = e.target.value;
+                        const selectedDiv = db.divisions.find(d => d.id === selectedId);
+                        const normName = selectedDiv
+                          ? (selectedDiv.name === 'App Development' ? 'App Dev' : selectedDiv.name === 'Research & Development' ? 'R&D' : selectedDiv.name)
+                          : e.target.value;
+                        setMemberForm({
+                          ...memberForm,
+                          divisionId: selectedId,
+                          division: normName,
+                        });
+                      }}
                       className="w-full px-3 py-2 text-sm text-white bg-[#0a0a0f] border border-white/8 rounded-lg focus:outline-none"
                     >
-                      <option value="Leadership">Leadership</option>
-                      <option value="App Dev">App Dev</option>
-                      <option value="R&D">R&D</option>
-                      <option value="Other">Other</option>
+                      {db.divisions.length > 0 ? (
+                        db.divisions.map(d => (
+                          <option key={d.id} value={d.id}>
+                            {d.name}
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="App Dev">App Development</option>
+                          <option value="R&D">Research & Development</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div>

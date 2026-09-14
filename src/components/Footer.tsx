@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 <Linkedin size={16} />
               </a>
               <a
-                href="mailto:contact@alterino.org"
+                href="mailto:alterino@bmsit.in"
                 className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff]"
                 title="Email Club"
                 aria-label="Email Alterino Club"

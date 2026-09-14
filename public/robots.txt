@@ -7,4 +7,4 @@ Disallow: /#/admin
 Disallow: /admin
 
 # Sitemap location (Update domain if deploying to custom institution subdomain)
-Sitemap: https://alterino.org/sitemap.xml
+Sitemap: https://alterinobmsit.org/sitemap.xml

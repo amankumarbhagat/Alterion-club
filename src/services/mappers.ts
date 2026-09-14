@@ -16,11 +16,17 @@ import type {
 // ==================== FRONTEND MAPPERS ====================
 
 export function mapApiMember(raw: any): Member {
+  const rawDiv = raw.division?.name || raw.divisionName;
+  let normalizedDiv = rawDiv || (raw.isLeadership ? 'Leadership' : 'Other');
+  if (normalizedDiv === 'App Development') normalizedDiv = 'App Dev';
+  if (normalizedDiv === 'Research & Development') normalizedDiv = 'R&D';
+
   return {
     id: raw.id,
     name: raw.name || '',
     role: raw.role || '',
-    division: raw.division?.name || raw.divisionName || (raw.isLeadership ? 'Leadership' : 'Other'),
+    division: normalizedDiv,
+    divisionId: raw.divisionId || raw.division?.id || '',
     email: raw.email || '',
     github: raw.github || '',
     linkedin: raw.linkedin || '',
@@ -275,6 +281,10 @@ export function toApiMemberPayload(item: Partial<Member>) {
   if (item.image !== undefined) {
     payload.imageUrl = item.image;
     delete payload.image;
+  }
+  delete payload.id;
+  if (!payload.divisionId) {
+    delete payload.divisionId;
   }
   return payload;
 }
